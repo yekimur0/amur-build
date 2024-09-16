@@ -175,15 +175,72 @@ function openModal() {
   modal.classList.add('modal--active');
 }
 const forms = document.querySelector('form');
+const tel = document.querySelector('input[name="tel"]');
+const im = new Inputmask("+7 999 999 99 99");
+
+if (tel) {
+  im.mask(tel);
+}
+
 forms.addEventListener('submit', e => {
   e.preventDefault();
-  const modal = e.target.closest('.modal');
-  const successModal = document.querySelector('#modal-success');
-  modal.classList.remove('modal--active');
-  setTimeout(() => {
-    successModal.classList.add('modal--active');
-  }, 1000);
+  
+  const target = e.target;
+  const isValidate = validateForm(target);
+  
+  if (isValidate) {
+    const modal = target.closest('.modal');
+    const successModal = document.querySelector('#modal-success');
+    
+    modal.classList.remove('modal--active');
+    target.reset();
+    
+    setTimeout(() => {
+      successModal.classList.add('modal--active');
+    }, 1000);
+  }
 });
+
+function validateForm(form) {
+  let isValid = true;
+
+  const fields = [
+    form.querySelector('input[name="name"]'),
+    form.querySelector('input[name="tel"]'),
+    form.querySelector('input[name="sector"]'),
+    form.querySelector('input[name="ryad"]'),
+    form.querySelector('input[name="place"]')
+  ];
+
+  const checkboxes = form.querySelectorAll('.input-checkbox');
+
+  checkboxes.forEach(checkbox => {
+    const parent = checkbox.closest('.modal__form-policy');
+    if (!checkbox.checked) {
+      parent.classList.add('error-policy');
+      isValid = false;
+    } else {
+      parent.classList.remove('error-policy');
+    }
+  });
+
+  fields.forEach(field => {
+    const parent = field.closest('.modal__form-block');
+    if (field.value.trim() === '') {
+      field.classList.add('error-input');
+      parent.classList.add('modal__form-block-error');
+      parent.setAttribute('data-clue-error', 'Важно заполнить поле');
+      isValid = false;
+    } else {
+      field.classList.remove('error-input');
+      parent.classList.remove('modal__form-block-error');
+      parent.removeAttribute('data-clue-error');
+    }
+  });
+
+  return isValid;
+}
+
 
 /***/ }),
 
@@ -13494,3 +13551,5 @@ __webpack_require__.r(__webpack_exports__);
 
 /******/ })()
 ;
+
+
